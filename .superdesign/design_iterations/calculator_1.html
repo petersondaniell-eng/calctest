@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Calculator - Superdesign</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: 20px !important;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(20px) !important;
+            border-radius: 24px !important;
+            padding: 30px !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            max-width: 320px !important;
+            width: 100% !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .calculator:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.6) !important;
+            border-radius: 16px !important;
+            padding: 24px !important;
+            margin-bottom: 24px !important;
+            text-align: right !important;
+            min-height: 80px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .previous-operand {
+            color: rgba(255, 255, 255, 0.6) !important;
+            font-size: 18px !important;
+            margin-bottom: 8px !important;
+            min-height: 22px !important;
+            font-weight: 300 !important;
+        }
+
+        .current-operand {
+            color: white !important;
+            font-size: 32px !important;
+            font-weight: 300 !important;
+            word-wrap: break-word !important;
+            word-break: break-all !important;
+        }
+
+        .buttons {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 12px !important;
+        }
+
+        .btn {
+            border: none !important;
+            border-radius: 50% !important;
+            font-size: 20px !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            height: 64px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.05) !important;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+            background: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98) !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .btn-number {
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        .btn-number:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        .btn-operator {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+            font-size: 24px !important;
+        }
+
+        .btn-operator:hover {
+            background: linear-gradient(135deg, #ff5252, #d63031) !important;
+        }
+
+        .btn-equals {
+            background: linear-gradient(135deg, #00d2d3, #54a0ff) !important;
+            font-size: 28px !important;
+        }
+
+        .btn-equals:hover {
+            background: linear-gradient(135deg, #00a8cc, #2f7bf4) !important;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #ff9ff3, #f368e0) !important;
+        }
+
+        .btn-clear:hover {
+            background: linear-gradient(135deg, #ff85d4, #e056fd) !important;
+        }
+
+        .btn-delete {
+            background: rgba(255, 255, 255, 0.2) !important;
+            font-size: 18px !important;
+        }
+
+        .btn-delete:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .span-two {
+            grid-column: span 2 !important;
+            border-radius: 32px !important;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .ripple-effect {
+            position: relative !important;
+            overflow: hidden !important;
+        }
+
+        .ripple-effect::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .ripple-effect:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 20px !important;
+                margin: 10px !important;
+            }
+
+            .btn {
+                height: 56px !important;
+                font-size: 18px !important;
+            }
+
+            .current-operand {
+                font-size: 28px !important;
+            }
+
+            .previous-operand {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Enhanced animations */
+        .calculator {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .btn {
+            animation: fadeInScale 0.4s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Stagger animation for buttons */
+        .btn:nth-child(1) { animation-delay: 0.1s; }
+        .btn:nth-child(2) { animation-delay: 0.15s; }
+        .btn:nth-child(3) { animation-delay: 0.2s; }
+        .btn:nth-child(4) { animation-delay: 0.25s; }
+        .btn:nth-child(5) { animation-delay: 0.3s; }
+        .btn:nth-child(6) { animation-delay: 0.35s; }
+        .btn:nth-child(7) { animation-delay: 0.4s; }
+        .btn:nth-child(8) { animation-delay: 0.45s; }
+        .btn:nth-child(9) { animation-delay: 0.5s; }
+        .btn:nth-child(10) { animation-delay: 0.55s; }
+        .btn:nth-child(11) { animation-delay: 0.6s; }
+        .btn:nth-child(12) { animation-delay: 0.65s; }
+        .btn:nth-child(13) { animation-delay: 0.7s; }
+        .btn:nth-child(14) { animation-delay: 0.75s; }
+        .btn:nth-child(15) { animation-delay: 0.8s; }
+        .btn:nth-child(16) { animation-delay: 0.85s; }
+        .btn:nth-child(17) { animation-delay: 0.9s; }
+        .btn:nth-child(18) { animation-delay: 0.95s; }
+        .btn:nth-child(19) { animation-delay: 1s; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="previous-operand" id="previous-operand"></div>
+            <div class="current-operand" id="current-operand">0</div>
+        </div>
+        <div class="buttons">
+            <button class="btn btn-clear span-two ripple-effect" data-clear>AC</button>
+            <button class="btn btn-delete ripple-effect" data-delete>⌫</button>
+            <button class="btn btn-operator ripple-effect" data-operator>÷</button>
+
+            <button class="btn btn-number ripple-effect" data-number>7</button>
+            <button class="btn btn-number ripple-effect" data-number>8</button>
+            <button class="btn btn-number ripple-effect" data-number>9</button>
+            <button class="btn btn-operator ripple-effect" data-operator>×</button>
+
+            <button class="btn btn-number ripple-effect" data-number>4</button>
+            <button class="btn btn-number ripple-effect" data-number>5</button>
+            <button class="btn btn-number ripple-effect" data-number>6</button>
+            <button class="btn btn-operator ripple-effect" data-operator>-</button>
+
+            <button class="btn btn-number ripple-effect" data-number>1</button>
+            <button class="btn btn-number ripple-effect" data-number>2</button>
+            <button class="btn btn-number ripple-effect" data-number>3</button>
+            <button class="btn btn-operator ripple-effect" data-operator>+</button>
+
+            <button class="btn btn-number span-two ripple-effect" data-number>0</button>
+            <button class="btn btn-number ripple-effect" data-number>.</button>
+            <button class="btn btn-equals ripple-effect" data-equals>=</button>
+        </div>
+    </div>
+
+    <script>
+        class Calculator {
+            constructor(previousOperandElement, currentOperandElement) {
+                this.previousOperandElement = previousOperandElement;
+                this.currentOperandElement = currentOperandElement;
+                this.clear();
+            }
+
+            clear() {
+                this.currentOperand = '';
+                this.previousOperand = '';
+                this.operation = undefined;
+            }
+
+            delete() {
+                this.currentOperand = this.currentOperand.toString().slice(0, -1);
+            }
+
+            appendNumber(number) {
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                this.currentOperand = this.currentOperand.toString() + number.toString();
+            }
+
+            chooseOperation(operation) {
+                if (this.currentOperand === '') return;
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '';
+            }
+
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(prev) || isNaN(current)) return;
+
+                switch (this.operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '×':
+                        computation = prev * current;
+                        break;
+                    case '÷':
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                this.currentOperand = computation;
+                this.operation = undefined;
+                this.previousOperand = '';
+            }
+
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                let integerDisplay;
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', {
+                        maximumFractionDigits: 0
+                    });
+                }
+                if (decimalDigits != null) {
+                    return `${integerDisplay}.${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+
+            updateDisplay() {
+                this.currentOperandElement.innerText =
+                    this.getDisplayNumber(this.currentOperand) || '0';
+                if (this.operation != null) {
+                    this.previousOperandElement.innerText =
+                        `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+                } else {
+                    this.previousOperandElement.innerText = '';
+                }
+            }
+        }
+
+        const numberButtons = document.querySelectorAll('[data-number]');
+        const operationButtons = document.querySelectorAll('[data-operator]');
+        const equalsButton = document.querySelector('[data-equals]');
+        const deleteButton = document.querySelector('[data-delete]');
+        const allClearButton = document.querySelector('[data-clear]');
+        const previousOperandElement = document.getElementById('previous-operand');
+        const currentOperandElement = document.getElementById('current-operand');
+
+        const calculator = new Calculator(previousOperandElement, currentOperandElement);
+
+        // Add click sound effect
+        function playClickSound() {
+            // Create a simple click sound using Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        numberButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                playClickSound();
+                calculator.appendNumber(button.innerText);
+                calculator.updateDisplay();
+            });
+        });
+
+        operationButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                playClickSound();
+                calculator.chooseOperation(button.innerText);
+                calculator.updateDisplay();
+            });
+        });
+
+        equalsButton.addEventListener('click', (e) => {
+            playClickSound();
+            calculator.compute();
+            calculator.updateDisplay();
+        });
+
+        allClearButton.addEventListener('click', (e) => {
+            playClickSound();
+            calculator.clear();
+            calculator.updateDisplay();
+        });
+
+        deleteButton.addEventListener('click', (e) => {
+            playClickSound();
+            calculator.delete();
+            calculator.updateDisplay();
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9' || e.key === '.') {
+                playClickSound();
+                calculator.appendNumber(e.key);
+                calculator.updateDisplay();
+            }
+
+            if (e.key === '+' || e.key === '-') {
+                playClickSound();
+                calculator.chooseOperation(e.key);
+                calculator.updateDisplay();
+            }
+
+            if (e.key === '*') {
+                playClickSound();
+                calculator.chooseOperation('×');
+                calculator.updateDisplay();
+            }
+
+            if (e.key === '/') {
+                e.preventDefault();
+                playClickSound();
+                calculator.chooseOperation('÷');
+                calculator.updateDisplay();
+            }
+
+            if (e.key === 'Enter' || e.key === '=') {
+                playClickSound();
+                calculator.compute();
+                calculator.updateDisplay();
+            }
+
+            if (e.key === 'Backspace') {
+                playClickSound();
+                calculator.delete();
+                calculator.updateDisplay();
+            }
+
+            if (e.key === 'Escape') {
+                playClickSound();
+                calculator.clear();
+                calculator.updateDisplay();
+            }
+        });
+    </script>
+</body>
+</html>

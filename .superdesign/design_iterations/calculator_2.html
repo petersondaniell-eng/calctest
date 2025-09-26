@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neo-brutalism Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: oklch(1.0000 0 0);
+            --foreground: oklch(0 0 0);
+            --primary: oklch(0.6489 0.2370 26.9728);
+            --secondary: oklch(0.9680 0.2110 109.7692);
+            --accent: oklch(0.5635 0.2408 260.8178);
+            --destructive: oklch(0.7323 0.2492 142.4953);
+            --shadow: 4px 4px 0px 0px hsl(0 0% 0% / 1.00);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace !important;
+            background: var(--background) !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: 20px !important;
+        }
+
+        .calculator {
+            background: var(--background) !important;
+            border: 4px solid var(--foreground) !important;
+            padding: 24px !important;
+            box-shadow: var(--shadow) !important;
+            max-width: 320px !important;
+            width: 100% !important;
+            transform: rotate(-1deg) !important;
+            transition: transform 0.2s ease !important;
+        }
+
+        .calculator:hover {
+            transform: rotate(0deg) scale(1.02) !important;
+        }
+
+        .display {
+            background: var(--secondary) !important;
+            border: 3px solid var(--foreground) !important;
+            padding: 20px !important;
+            margin-bottom: 20px !important;
+            text-align: right !important;
+            min-height: 80px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            box-shadow: 2px 2px 0px 0px var(--foreground) !important;
+        }
+
+        .previous-operand {
+            color: var(--foreground) !important;
+            font-size: 16px !important;
+            margin-bottom: 8px !important;
+            font-weight: 400 !important;
+            opacity: 0.7 !important;
+        }
+
+        .current-operand {
+            color: var(--foreground) !important;
+            font-size: 28px !important;
+            font-weight: 700 !important;
+            word-wrap: break-word !important;
+        }
+
+        .buttons {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 8px !important;
+        }
+
+        .btn {
+            border: 3px solid var(--foreground) !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            height: 60px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--background) !important;
+            color: var(--foreground) !important;
+            font-family: 'Space Mono', monospace !important;
+            text-transform: uppercase !important;
+            transition: all 0.1s ease !important;
+            box-shadow: 2px 2px 0px 0px var(--foreground) !important;
+            position: relative !important;
+        }
+
+        .btn:hover {
+            transform: translate(-2px, -2px) !important;
+            box-shadow: 4px 4px 0px 0px var(--foreground) !important;
+        }
+
+        .btn:active {
+            transform: translate(2px, 2px) !important;
+            box-shadow: none !important;
+        }
+
+        .btn-number {
+            background: var(--background) !important;
+        }
+
+        .btn-operator {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+
+        .btn-equals {
+            background: var(--accent) !important;
+            color: white !important;
+        }
+
+        .btn-clear {
+            background: var(--destructive) !important;
+            color: white !important;
+        }
+
+        .btn-delete {
+            background: var(--secondary) !important;
+        }
+
+        .span-two {
+            grid-column: span 2 !important;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 16px !important;
+                margin: 10px !important;
+            }
+
+            .btn {
+                height: 50px !important;
+                font-size: 16px !important;
+            }
+
+            .current-operand {
+                font-size: 24px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="previous-operand" id="previous-operand"></div>
+            <div class="current-operand" id="current-operand">0</div>
+        </div>
+        <div class="buttons">
+            <button class="btn btn-clear span-two" data-clear>CLEAR</button>
+            <button class="btn btn-delete" data-delete>DEL</button>
+            <button class="btn btn-operator" data-operator>÷</button>
+
+            <button class="btn btn-number" data-number>7</button>
+            <button class="btn btn-number" data-number>8</button>
+            <button class="btn btn-number" data-number>9</button>
+            <button class="btn btn-operator" data-operator>×</button>
+
+            <button class="btn btn-number" data-number>4</button>
+            <button class="btn btn-number" data-number>5</button>
+            <button class="btn btn-number" data-number>6</button>
+            <button class="btn btn-operator" data-operator>-</button>
+
+            <button class="btn btn-number" data-number>1</button>
+            <button class="btn btn-number" data-number>2</button>
+            <button class="btn btn-number" data-number>3</button>
+            <button class="btn btn-operator" data-operator>+</button>
+
+            <button class="btn btn-number span-two" data-number>0</button>
+            <button class="btn btn-number" data-number>.</button>
+            <button class="btn btn-equals" data-equals>=</button>
+        </div>
+    </div>
+
+    <script>
+        class Calculator {
+            constructor(previousOperandElement, currentOperandElement) {
+                this.previousOperandElement = previousOperandElement;
+                this.currentOperandElement = currentOperandElement;
+                this.clear();
+            }
+
+            clear() {
+                this.currentOperand = '';
+                this.previousOperand = '';
+                this.operation = undefined;
+            }
+
+            delete() {
+                this.currentOperand = this.currentOperand.toString().slice(0, -1);
+            }
+
+            appendNumber(number) {
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                this.currentOperand = this.currentOperand.toString() + number.toString();
+            }
+
+            chooseOperation(operation) {
+                if (this.currentOperand === '') return;
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '';
+            }
+
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(prev) || isNaN(current)) return;
+
+                switch (this.operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '×':
+                        computation = prev * current;
+                        break;
+                    case '÷':
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                this.currentOperand = computation;
+                this.operation = undefined;
+                this.previousOperand = '';
+            }
+
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                let integerDisplay;
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', {
+                        maximumFractionDigits: 0
+                    });
+                }
+                if (decimalDigits != null) {
+                    return `${integerDisplay}.${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+
+            updateDisplay() {
+                this.currentOperandElement.innerText =
+                    this.getDisplayNumber(this.currentOperand) || '0';
+                if (this.operation != null) {
+                    this.previousOperandElement.innerText =
+                        `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+                } else {
+                    this.previousOperandElement.innerText = '';
+                }
+            }
+        }
+
+        const numberButtons = document.querySelectorAll('[data-number]');
+        const operationButtons = document.querySelectorAll('[data-operator]');
+        const equalsButton = document.querySelector('[data-equals]');
+        const deleteButton = document.querySelector('[data-delete]');
+        const allClearButton = document.querySelector('[data-clear]');
+        const previousOperandElement = document.getElementById('previous-operand');
+        const currentOperandElement = document.getElementById('current-operand');
+
+        const calculator = new Calculator(previousOperandElement, currentOperandElement);
+
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.appendNumber(button.innerText);
+                calculator.updateDisplay();
+            });
+        });
+
+        operationButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.chooseOperation(button.innerText);
+                calculator.updateDisplay();
+            });
+        });
+
+        equalsButton.addEventListener('click', () => {
+            calculator.compute();
+            calculator.updateDisplay();
+        });
+
+        allClearButton.addEventListener('click', () => {
+            calculator.clear();
+            calculator.updateDisplay();
+        });
+
+        deleteButton.addEventListener('click', () => {
+            calculator.delete();
+            calculator.updateDisplay();
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9' || e.key === '.') {
+                calculator.appendNumber(e.key);
+                calculator.updateDisplay();
+            }
+
+            if (e.key === '+' || e.key === '-') {
+                calculator.chooseOperation(e.key);
+                calculator.updateDisplay();
+            }
+
+            if (e.key === '*') {
+                calculator.chooseOperation('×');
+                calculator.updateDisplay();
+            }
+
+            if (e.key === '/') {
+                e.preventDefault();
+                calculator.chooseOperation('÷');
+                calculator.updateDisplay();
+            }
+
+            if (e.key === 'Enter' || e.key === '=') {
+                calculator.compute();
+                calculator.updateDisplay();
+            }
+
+            if (e.key === 'Backspace') {
+                calculator.delete();
+                calculator.updateDisplay();
+            }
+
+            if (e.key === 'Escape') {
+                calculator.clear();
+                calculator.updateDisplay();
+            }
+        });
+    </script>
+</body>
+</html>
