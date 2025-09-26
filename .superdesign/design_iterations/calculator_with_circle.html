@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Calculator with Circle Functions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --licorice: #171219;
+            --sunglow: #ffd23f;
+            --poppy: #db3a34;
+            --slate-gray: #70798c;
+            --dark-cyan: #119da4;
+            --licorice-rgb: 23, 18, 25;
+            --sunglow-rgb: 255, 210, 63;
+            --poppy-rgb: 219, 58, 52;
+            --slate-gray-rgb: 112, 121, 140;
+            --dark-cyan-rgb: 17, 157, 164;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(var(--dark-cyan-rgb), 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(var(--poppy-rgb), 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(var(--sunglow-rgb), 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, var(--licorice) 0%, var(--slate-gray) 100%) !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: 20px !important;
+            overflow: hidden !important;
+            animation: backgroundPulse 8s ease-in-out infinite !important;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(10deg); }
+        }
+
+        .calculator {
+            background:
+                linear-gradient(135deg,
+                    rgba(var(--licorice-rgb), 0.95) 0%,
+                    rgba(var(--slate-gray-rgb), 0.9) 100%) !important;
+            backdrop-filter: blur(25px) !important;
+            border-radius: 24px !important;
+            padding: 36px !important;
+            box-shadow:
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(var(--sunglow-rgb), 0.15),
+                inset 0 -1px 0 rgba(var(--dark-cyan-rgb), 0.1),
+                0 0 0 1px rgba(var(--sunglow-rgb), 0.1) !important;
+            max-width: 380px !important;
+            width: 100% !important;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1) !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+
+        .calculator::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(var(--sunglow-rgb), 0.1),
+                transparent,
+                rgba(var(--dark-cyan-rgb), 0.1),
+                transparent
+            );
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .calculator:hover {
+            transform: translateY(-5px) scale(1.02) !important;
+            box-shadow:
+                0 35px 70px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(var(--sunglow-rgb), 0.2),
+                inset 0 -1px 0 rgba(var(--dark-cyan-rgb), 0.15),
+                0 0 0 1px rgba(var(--sunglow-rgb), 0.2),
+                0 0 30px rgba(var(--sunglow-rgb), 0.3) !important;
+        }
+
+        .mode-toggle {
+            display: flex !important;
+            background: rgba(var(--licorice-rgb), 0.6) !important;
+            border-radius: 12px !important;
+            padding: 4px !important;
+            margin-bottom: 20px !important;
+            position: relative !important;
+        }
+
+        .mode-btn {
+            flex: 1 !important;
+            padding: 10px 16px !important;
+            border: none !important;
+            background: transparent !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            z-index: 2 !important;
+        }
+
+        .mode-btn.active {
+            color: white !important;
+            background: linear-gradient(135deg, var(--sunglow), rgba(var(--sunglow-rgb), 0.8)) !important;
+            box-shadow: 0 4px 12px rgba(var(--sunglow-rgb), 0.3) !important;
+        }
+
+        .display {
+            background:
+                linear-gradient(135deg,
+                    rgba(var(--slate-gray-rgb), 0.9) 0%,
+                    rgba(var(--dark-cyan-rgb), 0.9) 100%) !important;
+            border-radius: 20px !important;
+            padding: 28px !important;
+            margin-bottom: 28px !important;
+            text-align: right !important;
+            min-height: 120px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            position: relative !important;
+            overflow: hidden !important;
+            box-shadow:
+                inset 0 2px 4px rgba(0, 0, 0, 0.2),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .display::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(var(--sunglow-rgb), 0.15) 50%,
+                transparent 70%
+            );
+            animation: displayShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes displayShimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%); }
+            50% { transform: translateX(0%) translateY(0%); }
+        }
+
+        .mode-indicator {
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            margin-bottom: 8px !important;
+            position: relative !important;
+            z-index: 2 !important;
+        }
+
+        .previous-operand {
+            color: rgba(255, 255, 255, 0.75) !important;
+            font-size: 16px !important;
+            margin-bottom: 6px !important;
+            min-height: 20px !important;
+            font-weight: 400 !important;
+            position: relative !important;
+            z-index: 2 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .current-operand {
+            color: white !important;
+            font-size: 36px !important;
+            font-weight: 300 !important;
+            word-wrap: break-word !important;
+            word-break: break-all !important;
+            position: relative !important;
+            z-index: 2 !important;
+            transition: all 0.3s ease !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .buttons {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 16px !important;
+        }
+
+        .circle-buttons {
+            display: none !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 16px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .circle-buttons.active {
+            display: grid !important;
+        }
+
+        .btn {
+            border: none !important;
+            border-radius: 16px !important;
+            font-size: 18px !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1) !important;
+            height: 68px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-family: 'Inter', sans-serif !important;
+            position: relative !important;
+            overflow: hidden !important;
+            transform-origin: center !important;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .btn:active::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05) !important;
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98) !important;
+        }
+
+        .btn-circle {
+            background: linear-gradient(135deg,
+                rgba(var(--dark-cyan-rgb), 1) 0%,
+                rgba(var(--slate-gray-rgb), 1) 100%) !important;
+            color: white !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            text-align: center !important;
+            box-shadow:
+                0 6px 20px rgba(var(--dark-cyan-rgb), 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .btn-circle:hover {
+            background: linear-gradient(135deg,
+                rgba(var(--slate-gray-rgb), 1) 0%,
+                rgba(var(--dark-cyan-rgb), 1) 100%) !important;
+            box-shadow:
+                0 10px 30px rgba(var(--dark-cyan-rgb), 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 0 20px rgba(var(--dark-cyan-rgb), 0.3) !important;
+        }
+
+        .btn-number {
+            background: linear-gradient(135deg,
+                rgba(var(--slate-gray-rgb), 1) 0%,
+                rgba(var(--dark-cyan-rgb), 1) 100%) !important;
+            color: white !important;
+            font-size: 20px !important;
+            box-shadow:
+                0 6px 20px rgba(var(--dark-cyan-rgb), 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .btn-number:hover {
+            background: linear-gradient(135deg,
+                rgba(var(--dark-cyan-rgb), 1) 0%,
+                rgba(var(--slate-gray-rgb), 1) 100%) !important;
+            box-shadow:
+                0 10px 30px rgba(var(--dark-cyan-rgb), 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 0 20px rgba(var(--dark-cyan-rgb), 0.3) !important;
+        }
+
+        .btn-operator {
+            background: linear-gradient(135deg,
+                rgba(var(--poppy-rgb), 1) 0%,
+                rgba(var(--poppy-rgb), 0.8) 100%) !important;
+            color: white !important;
+            font-size: 24px !important;
+            font-weight: 600 !important;
+            box-shadow:
+                0 6px 20px rgba(var(--poppy-rgb), 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .btn-operator:hover {
+            background: linear-gradient(135deg,
+                rgba(var(--poppy-rgb), 1) 0%,
+                rgba(var(--poppy-rgb), 1) 100%) !important;
+            box-shadow:
+                0 10px 30px rgba(var(--poppy-rgb), 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 0 25px rgba(var(--poppy-rgb), 0.4) !important;
+        }
+
+        .btn-equals {
+            background: linear-gradient(135deg,
+                rgba(var(--sunglow-rgb), 1) 0%,
+                rgba(var(--sunglow-rgb), 0.9) 100%) !important;
+            color: var(--licorice) !important;
+            font-size: 28px !important;
+            font-weight: 700 !important;
+            box-shadow:
+                0 6px 20px rgba(var(--sunglow-rgb), 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            text-shadow: none !important;
+        }
+
+        .btn-equals:hover {
+            background: linear-gradient(135deg,
+                rgba(var(--sunglow-rgb), 1) 0%,
+                rgba(var(--sunglow-rgb), 1) 100%) !important;
+            box-shadow:
+                0 10px 30px rgba(var(--sunglow-rgb), 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 0 30px rgba(var(--sunglow-rgb), 0.5) !important;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg,
+                rgba(var(--poppy-rgb), 0.9) 0%,
+                rgba(var(--sunglow-rgb), 0.9) 100%) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            box-shadow:
+                0 6px 20px rgba(var(--poppy-rgb), 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .btn-clear:hover {
+            background: linear-gradient(135deg,
+                rgba(var(--sunglow-rgb), 0.9) 0%,
+                rgba(var(--poppy-rgb), 0.9) 100%) !important;
+            box-shadow:
+                0 10px 30px rgba(var(--sunglow-rgb), 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 0 25px rgba(var(--sunglow-rgb), 0.3) !important;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg,
+                rgba(var(--slate-gray-rgb), 0.9) 0%,
+                rgba(var(--licorice-rgb), 1) 100%) !important;
+            color: white !important;
+            font-size: 18px !important;
+            box-shadow:
+                0 6px 20px rgba(var(--slate-gray-rgb), 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .btn-delete:hover {
+            background: linear-gradient(135deg,
+                rgba(var(--licorice-rgb), 1) 0%,
+                rgba(var(--slate-gray-rgb), 0.9) 100%) !important;
+            box-shadow:
+                0 10px 30px rgba(var(--slate-gray-rgb), 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 0 20px rgba(var(--slate-gray-rgb), 0.3) !important;
+        }
+
+        .span-two {
+            grid-column: span 2 !important;
+        }
+
+        .span-three {
+            grid-column: span 3 !important;
+        }
+
+        /* Enhanced button press animation */
+        .btn-pressed {
+            animation: buttonPress 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes buttonPress {
+            0% { transform: translateY(-3px) scale(1.05); }
+            50% { transform: translateY(1px) scale(0.95); }
+            100% { transform: translateY(-3px) scale(1.05); }
+        }
+
+        /* Calculation result animation */
+        .result-animation {
+            animation: resultPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes resultPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Error shake animation */
+        .error-animation {
+            animation: errorShake 0.5s ease-in-out;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Loading animation */
+        .calculator {
+            animation: calculatorEntrance 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes calculatorEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(100px) scale(0.8) rotate(5deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+        }
+
+        /* Button stagger animation on load */
+        .btn, .mode-btn {
+            animation: buttonEntrance 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+        }
+
+        @keyframes buttonEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .mode-btn:nth-child(1) { animation-delay: 0.05s; }
+        .mode-btn:nth-child(2) { animation-delay: 0.1s; }
+
+        .btn:nth-child(1) { animation-delay: 0.15s; }
+        .btn:nth-child(2) { animation-delay: 0.2s; }
+        .btn:nth-child(3) { animation-delay: 0.25s; }
+        .btn:nth-child(4) { animation-delay: 0.3s; }
+        .btn:nth-child(5) { animation-delay: 0.35s; }
+        .btn:nth-child(6) { animation-delay: 0.4s; }
+        .btn:nth-child(7) { animation-delay: 0.45s; }
+        .btn:nth-child(8) { animation-delay: 0.5s; }
+        .btn:nth-child(9) { animation-delay: 0.55s; }
+        .btn:nth-child(10) { animation-delay: 0.6s; }
+        .btn:nth-child(11) { animation-delay: 0.65s; }
+        .btn:nth-child(12) { animation-delay: 0.7s; }
+        .btn:nth-child(13) { animation-delay: 0.75s; }
+        .btn:nth-child(14) { animation-delay: 0.8s; }
+        .btn:nth-child(15) { animation-delay: 0.85s; }
+        .btn:nth-child(16) { animation-delay: 0.9s; }
+        .btn:nth-child(17) { animation-delay: 0.95s; }
+        .btn:nth-child(18) { animation-delay: 1s; }
+        .btn:nth-child(19) { animation-delay: 1.05s; }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 28px !important;
+                margin: 10px !important;
+            }
+
+            .btn {
+                height: 60px !important;
+                font-size: 16px !important;
+            }
+
+            .btn-circle {
+                font-size: 10px !important;
+            }
+
+            .current-operand {
+                font-size: 30px !important;
+            }
+
+            .previous-operand {
+                font-size: 14px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="mode-toggle">
+            <button class="mode-btn active" data-mode="basic">Basic</button>
+            <button class="mode-btn" data-mode="circle">Circle</button>
+        </div>
+
+        <div class="display">
+            <div class="mode-indicator" id="mode-indicator">Basic Calculator</div>
+            <div class="previous-operand" id="previous-operand"></div>
+            <div class="current-operand" id="current-operand">0</div>
+        </div>
+
+        <div class="circle-buttons" id="circle-buttons">
+            <button class="btn btn-circle" data-circle="area"><span>Area<br/>πr²</span></button>
+            <button class="btn btn-circle" data-circle="circumference"><span>Circumference<br/>2πr</span></button>
+            <button class="btn btn-circle" data-circle="diameter"><span>Diameter<br/>2r</span></button>
+        </div>
+
+        <div class="buttons" id="basic-buttons">
+            <button class="btn btn-clear span-two" data-clear><span>AC</span></button>
+            <button class="btn btn-delete" data-delete><span>⌫</span></button>
+            <button class="btn btn-operator" data-operator><span>÷</span></button>
+
+            <button class="btn btn-number" data-number><span>7</span></button>
+            <button class="btn btn-number" data-number><span>8</span></button>
+            <button class="btn btn-number" data-number><span>9</span></button>
+            <button class="btn btn-operator" data-operator><span>×</span></button>
+
+            <button class="btn btn-number" data-number><span>4</span></button>
+            <button class="btn btn-number" data-number><span>5</span></button>
+            <button class="btn btn-number" data-number><span>6</span></button>
+            <button class="btn btn-operator" data-operator><span>-</span></button>
+
+            <button class="btn btn-number" data-number><span>1</span></button>
+            <button class="btn btn-number" data-number><span>2</span></button>
+            <button class="btn btn-number" data-number><span>3</span></button>
+            <button class="btn btn-operator" data-operator><span>+</span></button>
+
+            <button class="btn btn-number span-two" data-number><span>0</span></button>
+            <button class="btn btn-number" data-number><span>.</span></button>
+            <button class="btn btn-equals" data-equals><span>=</span></button>
+        </div>
+    </div>
+
+    <script>
+        class AdvancedCalculator {
+            constructor(previousOperandElement, currentOperandElement, modeIndicatorElement) {
+                this.previousOperandElement = previousOperandElement;
+                this.currentOperandElement = currentOperandElement;
+                this.modeIndicatorElement = modeIndicatorElement;
+                this.currentMode = 'basic';
+                this.clear();
+            }
+
+            clear() {
+                this.currentOperand = '';
+                this.previousOperand = '';
+                this.operation = undefined;
+            }
+
+            delete() {
+                this.currentOperand = this.currentOperand.toString().slice(0, -1);
+            }
+
+            appendNumber(number) {
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                this.currentOperand = this.currentOperand.toString() + number.toString();
+            }
+
+            chooseOperation(operation) {
+                if (this.currentOperand === '') return;
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '';
+            }
+
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(prev) || isNaN(current)) return;
+
+                switch (this.operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '×':
+                        computation = prev * current;
+                        break;
+                    case '÷':
+                        if (current === 0) {
+                            this.showError();
+                            return;
+                        }
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                this.currentOperand = computation;
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.animateResult();
+            }
+
+            calculateCircle(type) {
+                const radius = parseFloat(this.currentOperand);
+                if (isNaN(radius) || radius <= 0) {
+                    this.showError();
+                    return;
+                }
+
+                let result;
+                let operation;
+
+                switch (type) {
+                    case 'area':
+                        result = Math.PI * radius * radius;
+                        operation = `π × ${radius}²`;
+                        break;
+                    case 'circumference':
+                        result = 2 * Math.PI * radius;
+                        operation = `2 × π × ${radius}`;
+                        break;
+                    case 'diameter':
+                        result = 2 * radius;
+                        operation = `2 × ${radius}`;
+                        break;
+                    default:
+                        return;
+                }
+
+                this.previousOperand = operation;
+                this.currentOperand = result;
+                this.operation = undefined;
+                this.animateResult();
+            }
+
+            setMode(mode) {
+                this.currentMode = mode;
+                this.clear();
+                this.updateDisplay();
+                this.updateModeIndicator();
+            }
+
+            updateModeIndicator() {
+                const indicators = {
+                    basic: 'Basic Calculator',
+                    circle: 'Circle Calculator'
+                };
+                this.modeIndicatorElement.innerText = indicators[this.currentMode];
+            }
+
+            showError() {
+                this.currentOperandElement.classList.add('error-animation');
+                setTimeout(() => {
+                    this.currentOperandElement.classList.remove('error-animation');
+                }, 500);
+            }
+
+            animateResult() {
+                this.currentOperandElement.classList.add('result-animation');
+                setTimeout(() => {
+                    this.currentOperandElement.classList.remove('result-animation');
+                }, 500);
+            }
+
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                if (stringNumber.includes('e')) {
+                    return parseFloat(number).toExponential(6);
+                }
+
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                let integerDisplay;
+
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', {
+                        maximumFractionDigits: 0
+                    });
+                }
+
+                if (decimalDigits != null) {
+                    // Limit decimal places for readability
+                    const limitedDecimals = decimalDigits.length > 6 ?
+                        parseFloat('0.' + decimalDigits).toFixed(6).slice(2) : decimalDigits;
+                    return `${integerDisplay}.${limitedDecimals}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+
+            updateDisplay() {
+                this.currentOperandElement.innerText =
+                    this.getDisplayNumber(this.currentOperand) || '0';
+
+                if (this.operation != null) {
+                    this.previousOperandElement.innerText =
+                        `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+                } else if (this.previousOperand !== '') {
+                    this.previousOperandElement.innerText = this.previousOperand;
+                } else {
+                    this.previousOperandElement.innerText = '';
+                }
+            }
+        }
+
+        // Initialize calculator
+        const previousOperandElement = document.getElementById('previous-operand');
+        const currentOperandElement = document.getElementById('current-operand');
+        const modeIndicatorElement = document.getElementById('mode-indicator');
+
+        const calculator = new AdvancedCalculator(
+            previousOperandElement,
+            currentOperandElement,
+            modeIndicatorElement
+        );
+
+        // Get UI elements
+        const numberButtons = document.querySelectorAll('[data-number]');
+        const operationButtons = document.querySelectorAll('[data-operator]');
+        const equalsButton = document.querySelector('[data-equals]');
+        const deleteButton = document.querySelector('[data-delete]');
+        const allClearButton = document.querySelector('[data-clear]');
+        const modeButtons = document.querySelectorAll('[data-mode]');
+        const circleButtons = document.querySelectorAll('[data-circle]');
+        const circleButtonsContainer = document.getElementById('circle-buttons');
+
+        // Enhanced button press animation
+        function addPressEffect(button) {
+            button.classList.add('btn-pressed');
+            setTimeout(() => {
+                button.classList.remove('btn-pressed');
+            }, 200);
+        }
+
+        // Haptic feedback simulation
+        function hapticFeedback() {
+            if (navigator.vibrate) {
+                navigator.vibrate(10);
+            }
+        }
+
+        // Mode switching
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                const mode = button.getAttribute('data-mode');
+                calculator.setMode(mode);
+
+                if (mode === 'circle') {
+                    circleButtonsContainer.classList.add('active');
+                } else {
+                    circleButtonsContainer.classList.remove('active');
+                }
+
+                addPressEffect(button);
+                hapticFeedback();
+            });
+        });
+
+        // Circle function buttons
+        circleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const circleType = button.getAttribute('data-circle');
+                addPressEffect(button);
+                hapticFeedback();
+                calculator.calculateCircle(circleType);
+                calculator.updateDisplay();
+            });
+        });
+
+        // Basic calculator buttons
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                addPressEffect(button);
+                hapticFeedback();
+                calculator.appendNumber(button.querySelector('span').innerText);
+                calculator.updateDisplay();
+            });
+        });
+
+        operationButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                addPressEffect(button);
+                hapticFeedback();
+                calculator.chooseOperation(button.querySelector('span').innerText);
+                calculator.updateDisplay();
+            });
+        });
+
+        equalsButton.addEventListener('click', () => {
+            addPressEffect(equalsButton);
+            hapticFeedback();
+            calculator.compute();
+            calculator.updateDisplay();
+        });
+
+        allClearButton.addEventListener('click', () => {
+            addPressEffect(allClearButton);
+            hapticFeedback();
+            calculator.clear();
+            calculator.updateDisplay();
+        });
+
+        deleteButton.addEventListener('click', () => {
+            addPressEffect(deleteButton);
+            hapticFeedback();
+            calculator.delete();
+            calculator.updateDisplay();
+        });
+
+        // Enhanced keyboard support
+        document.addEventListener('keydown', (e) => {
+            let button = null;
+
+            if (e.key >= '0' && e.key <= '9') {
+                button = [...numberButtons].find(btn =>
+                    btn.querySelector('span').innerText === e.key);
+                calculator.appendNumber(e.key);
+                calculator.updateDisplay();
+            } else if (e.key === '.') {
+                button = [...numberButtons].find(btn =>
+                    btn.querySelector('span').innerText === '.');
+                calculator.appendNumber(e.key);
+                calculator.updateDisplay();
+            } else if (e.key === '+' || e.key === '-') {
+                button = [...operationButtons].find(btn =>
+                    btn.querySelector('span').innerText === e.key);
+                calculator.chooseOperation(e.key);
+                calculator.updateDisplay();
+            } else if (e.key === '*') {
+                button = [...operationButtons].find(btn =>
+                    btn.querySelector('span').innerText === '×');
+                calculator.chooseOperation('×');
+                calculator.updateDisplay();
+            } else if (e.key === '/') {
+                e.preventDefault();
+                button = [...operationButtons].find(btn =>
+                    btn.querySelector('span').innerText === '÷');
+                calculator.chooseOperation('÷');
+                calculator.updateDisplay();
+            } else if (e.key === 'Enter' || e.key === '=') {
+                button = equalsButton;
+                calculator.compute();
+                calculator.updateDisplay();
+            } else if (e.key === 'Backspace') {
+                button = deleteButton;
+                calculator.delete();
+                calculator.updateDisplay();
+            } else if (e.key === 'Escape') {
+                button = allClearButton;
+                calculator.clear();
+                calculator.updateDisplay();
+            } else if (e.key === 'c' || e.key === 'C') {
+                // Toggle to circle mode
+                const circleBtn = document.querySelector('[data-mode="circle"]');
+                if (circleBtn && !circleBtn.classList.contains('active')) {
+                    circleBtn.click();
+                }
+            } else if (e.key === 'b' || e.key === 'B') {
+                // Toggle to basic mode
+                const basicBtn = document.querySelector('[data-mode="basic"]');
+                if (basicBtn && !basicBtn.classList.contains('active')) {
+                    basicBtn.click();
+                }
+            } else if (calculator.currentMode === 'circle') {
+                // Circle mode shortcuts
+                if (e.key === 'a' || e.key === 'A') {
+                    button = document.querySelector('[data-circle="area"]');
+                    calculator.calculateCircle('area');
+                    calculator.updateDisplay();
+                } else if (e.key === 'r' || e.key === 'R') {
+                    button = document.querySelector('[data-circle="circumference"]');
+                    calculator.calculateCircle('circumference');
+                    calculator.updateDisplay();
+                } else if (e.key === 'd' || e.key === 'D') {
+                    button = document.querySelector('[data-circle="diameter"]');
+                    calculator.calculateCircle('diameter');
+                    calculator.updateDisplay();
+                }
+            }
+
+            if (button) {
+                addPressEffect(button);
+                hapticFeedback();
+            }
+        });
+    </script>
+</body>
+</html>
